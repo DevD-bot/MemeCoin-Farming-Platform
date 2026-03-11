@@ -14,7 +14,7 @@ const Explore = () => {
   const fetchCoins = async (query = 'SOL') => {
     setLoading(true);
     try {
-      const response = await axios.get(`http://localhost:5000/api/dex/search?q=${query}`);
+      const response = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/dex/search?q=${query}`);
       const mappedCoins = (response.data.pairs || []).map(pair => ({
         name: pair.baseToken.name,
         symbol: pair.baseToken.symbol,

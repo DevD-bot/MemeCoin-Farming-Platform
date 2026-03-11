@@ -21,7 +21,7 @@ const Launch = () => {
   useEffect(() => {
     const fetchInspiration = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/dex/boosts/latest');
+        const response = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/dex/boosts/latest`);
         setAds(response.data.slice(0, 3));
       } catch (error) {
         console.error('Failed to fetch inspiration:', error);

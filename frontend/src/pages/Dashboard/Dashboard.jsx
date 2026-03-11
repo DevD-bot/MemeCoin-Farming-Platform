@@ -23,7 +23,7 @@ const Dashboard = () => {
       const stored = localStorage.getItem('tracked_tokens');
       const addresses = stored ? JSON.parse(stored) : DEFAULT_TRACKED;
       
-      const response = await axios.get(`http://localhost:5000/api/dex/tokens/${addresses.join(',')}`);
+      const response = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/dex/tokens/${addresses.join(',')}`);
       const pairs = response.data.pairs || [];
       
       const mapped = pairs.map(pair => ({

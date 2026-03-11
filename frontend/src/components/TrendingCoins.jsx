@@ -11,13 +11,13 @@ const TrendingCoins = () => {
   useEffect(() => {
     const fetchTrending = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/dex/boosts/latest');
+        const response = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/dex/boosts/latest`);
         const latestBoosts = response.data.slice(0, 4);
         
         const detailedCoins = await Promise.all(
           latestBoosts.map(async (boost) => {
             try {
-              const tokenRes = await axios.get(`http://localhost:5000/api/dex/tokens/${boost.tokenAddress}`);
+              const tokenRes = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/dex/tokens/${boost.tokenAddress}`);
               const pair = tokenRes.data.pairs?.[0];
               return {
                 ...pair,

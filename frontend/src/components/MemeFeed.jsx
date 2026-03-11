@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Zap, ExternalLink, Clock, Globe, ShieldCheck, Heart } from 'lucide-react';
 import axios from 'axios';
 
-const socket = io('http://localhost:5000');
+const socket = io(import.meta.env.VITE_API_URL || 'http://localhost:5000');
 
 const MemeFeed = () => {
   const [news, setNews] = useState([]);
@@ -24,7 +24,7 @@ const MemeFeed = () => {
 
     const fetchProfiles = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/dex/boosts/latest');
+        const response = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/dex/boosts/latest`);
         const profiledItems = response.data.slice(0, 5).map(item => ({
           id: item.tokenAddress,
           name: item.tokenAddress.slice(0, 8),
