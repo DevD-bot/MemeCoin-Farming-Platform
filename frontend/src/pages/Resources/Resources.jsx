@@ -61,9 +61,11 @@ const Resources = () => {
               <div>
                 <h3 className="text-xl font-bold text-white mb-2">{res.title}</h3>
                 <p className="text-slate-400 text-sm leading-relaxed mb-6">{res.description}</p>
-                <button className="text-cyan-400 font-bold text-xs uppercase tracking-widest flex items-center gap-2 hover:text-cyan-300">
-                  Access Resource <Zap size={14} />
-                </button>
+                <a href={res.link} target="_blank" rel="noreferrer" className="inline-block">
+                  <button className="text-cyan-400 font-bold text-xs uppercase tracking-widest flex items-center gap-2 hover:text-cyan-300">
+                    Access Resource <Zap size={14} />
+                  </button>
+                </a>
               </div>
             </div>
           </motion.div>

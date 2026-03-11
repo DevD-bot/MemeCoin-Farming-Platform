@@ -16,13 +16,13 @@ const Explore = () => {
     try {
       const response = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/dex/search?q=${query}`);
       const mappedCoins = (response.data.pairs || []).map(pair => ({
-        name: pair.baseToken.name,
-        symbol: pair.baseToken.symbol,
-        price: `$${parseFloat(pair.priceUsd).toFixed(6)}`,
-        change: `${pair.priceChange?.h24 > 0 ? '+' : ''}${pair.priceChange?.h24 || 0}%`,
-        marketCap: `$${(pair.fdv || 0).toLocaleString()}`,
-        liquidity: `$${(pair.liquidity?.usd || 0).toLocaleString()}`,
-        tags: [pair.dexId, pair.chainId],
+        name: pair?.baseToken?.name || 'Unknown',
+        symbol: pair?.baseToken?.symbol || 'N/A',
+        price: pair?.priceUsd ? `$${parseFloat(pair.priceUsd).toFixed(6)}` : 'N/A',
+        change: `${pair?.priceChange?.h24 > 0 ? '+' : ''}${pair?.priceChange?.h24 || 0}%`,
+        marketCap: `$${(pair?.fdv || 0).toLocaleString()}`,
+        liquidity: `$${(pair?.liquidity?.usd || 0).toLocaleString()}`,
+        tags: [pair?.dexId || 'unknown', pair?.chainId || 'unknown'],
         image: pair.info?.imageUrl,
         url: pair.url,
         address: pair.baseToken.address,

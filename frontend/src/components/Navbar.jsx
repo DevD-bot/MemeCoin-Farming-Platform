@@ -24,7 +24,7 @@ const Navbar = () => {
           </span>
         </Link>
 
-        <div className="hidden lg:flex items-center gap-2 bg-slate-900/50 p-1.5 rounded-2xl border border-white/5">
+        <div className="hidden md:flex items-center gap-2 bg-slate-900/50 p-1.5 rounded-2xl border border-white/5">
           {navItems.map((item) => (
             <NavItem 
               key={item.name} 

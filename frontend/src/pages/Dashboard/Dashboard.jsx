@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Wallet, Coins, Pickaxe, TrendingUp, ArrowUpRight, PlusCircle, RefreshCw } from 'lucide-react';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 
 const Dashboard = () => {
   const [trackedCoins, setTrackedCoins] = useState([]);
@@ -29,7 +30,7 @@ const Dashboard = () => {
       const mapped = pairs.map(pair => ({
         name: pair.baseToken.name,
         ticker: pair.baseToken.symbol,
-        balance: (Math.random() * 500 + 10).toFixed(1), // Simulated balance
+        balance: "0.00", // Will be populated by connected wallet in future
         value: `$${parseFloat(pair.priceUsd).toFixed(2)}`,
         profit: `${pair.priceChange?.h24 > 0 ? '+' : ''}${pair.priceChange?.h24 || 0}%`,
         address: pair.baseToken.address
@@ -49,11 +50,16 @@ const Dashboard = () => {
     return () => clearInterval(interval);
   }, [fetchPortfolio]);
 
+  const totalValueUsd = trackedCoins.reduce((acc, coin) => {
+    const val = parseFloat(coin.value.replace('$', ''));
+    return acc + (isNaN(val) ? 0 : val);
+  }, 0);
+
   const stats = [
-    { label: 'Network Value', value: '14.5 SOL', icon: <Wallet className="text-cyan-400" />, change: '+2.4%' },
+    { label: 'Network Value', value: loading ? '...' : `$${totalValueUsd.toFixed(2)}`, icon: <Wallet className="text-cyan-400" />, change: '+0.0%' },
     { label: 'Active Assets', value: trackedCoins.length.toString(), icon: <Coins className="text-blue-400" />, change: 'Live' },
-    { label: 'Staking Rewards', value: '1.2M PEPE2', icon: <Pickaxe className="text-teal-400" />, change: '+12.5%' },
-    { label: 'Market Volatility', value: '78.2', icon: <TrendingUp className="text-emerald-400" />, change: 'High' }
+    { label: 'Staking Rewards', value: '0.00 PEPE2', icon: <Pickaxe className="text-teal-400" />, change: '0.0%' },
+    { label: 'Market Volatility', value: loading ? '...' : 'Mid', icon: <TrendingUp className="text-emerald-400" />, change: 'Avg' }
   ];
 
   return (
@@ -64,12 +70,12 @@ const Dashboard = () => {
           <p className="text-slate-400 text-lg">Institutional-grade asset tracking and yield management.</p>
         </div>
         <div className="flex gap-4 w-full lg:w-auto">
-          <button className="flex-1 lg:flex-none px-8 py-4 glass rounded-xl font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-3 hover:bg-white/5 transition-all outline-none border-white/5">
+          <Link to="/explore" className="flex-1 lg:flex-none px-8 py-4 glass rounded-xl font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-3 hover:bg-white/5 transition-all outline-none border-white/5">
             <PlusCircle size={16} /> Track New Asset
-          </button>
-          <button className="flex-1 lg:flex-none btn-premium px-10 py-4 rounded-xl font-bold text-xs uppercase tracking-widest shadow-xl">
+          </Link>
+          <Link to="/launch" className="flex-1 lg:flex-none btn-premium px-10 py-4 rounded-xl font-bold text-xs uppercase tracking-widest shadow-xl flex items-center justify-center">
             Staking Launchpad
-          </button>
+          </Link>
         </div>
       </div>
 
@@ -145,9 +151,9 @@ const Dashboard = () => {
                         {coin.profit}
                       </td>
                       <td className="px-8 py-8 text-right">
-                        <button className="p-3 bg-white/5 rounded-xl text-slate-500 hover:text-cyan-400 hover:border-cyan-400/20 transition-all border border-transparent">
+                        <a href={`https://dexscreener.com/solana/${coin.address}`} target="_blank" rel="noopener noreferrer" className="p-3 bg-white/5 rounded-xl text-slate-500 hover:text-cyan-400 hover:border-cyan-400/20 transition-all border border-transparent inline-flex">
                           <ArrowUpRight size={18} />
-                        </button>
+                        </a>
                       </td>
                     </tr>
                   ))
@@ -170,7 +176,7 @@ const Dashboard = () => {
                   </div>
                   <div>
                     <p className="text-[10px] text-slate-500 uppercase font-black">Cluster Status</p>
-                    <p className="font-bold text-white text-sm">3 Operational Pools</p>
+                    <p className="font-bold text-white text-sm">0 Operational Pools</p>
                   </div>
                 </div>
                 <ArrowUpRight size={16} className="text-slate-600 group-hover:text-cyan-400 transition-colors" />
@@ -178,8 +184,11 @@ const Dashboard = () => {
 
               <div className="p-8 bg-gradient-to-br from-slate-800 to-slate-900 rounded-[2rem] border border-white/5 shadow-2xl">
                 <p className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-2">Aggregate Yield</p>
-                <h3 className="text-4xl font-black text-white mb-6 tracking-tighter">$4,280.50</h3>
-                <button className="w-full btn-premium py-4 rounded-xl font-bold text-xs uppercase tracking-widest shadow-lg active:scale-95 transition-transform">
+                <h3 className="text-4xl font-black text-white mb-6 tracking-tighter">{loading ? '...' : `$${(totalValueUsd * 0.12).toFixed(2)}`}</h3>
+                <button 
+                  className="w-full btn-premium py-4 rounded-xl font-bold text-xs uppercase tracking-widest shadow-lg active:scale-95 transition-transform"
+                  onClick={() => alert('Smart Contract integration required to harvest yields to wallet.')}
+                >
                   Harvest Yield matrix
                 </button>
               </div>

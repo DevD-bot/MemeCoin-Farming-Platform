@@ -12,7 +12,7 @@ const TrendingCoins = () => {
     const fetchTrending = async () => {
       try {
         const response = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/dex/boosts/latest`);
-        const latestBoosts = response.data.slice(0, 4);
+        const latestBoosts = Array.isArray(response.data) ? response.data.slice(0, 4) : [];
         
         const detailedCoins = await Promise.all(
           latestBoosts.map(async (boost) => {
