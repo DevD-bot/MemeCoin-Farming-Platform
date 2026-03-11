@@ -1,83 +1,95 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Rocket, TrendingUp, ShieldCheck } from 'lucide-react';
+import { Rocket, TrendingUp, ShieldCheck, Zap } from 'lucide-react';
+import logo from '../assets/logo.png';
 
 const Hero = () => {
   return (
-    <div className="relative pt-32 pb-20 px-6 overflow-hidden">
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-12">
-        <div className="flex-1 text-center md:text-left">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            <span className="px-4 py-1.5 rounded-full bg-pink-500/10 border border-pink-500/20 text-pink-500 text-sm font-bold tracking-wider uppercase mb-6 inline-block">
-              The Evolution of Memecoins
+    <div className="relative pt-40 pb-24 px-6 overflow-hidden">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+        >
+          <div className="inline-flex items-center gap-2 px-3 py-1 glass rounded-lg border border-white/5 mb-8">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
             </span>
-            <h1 className="text-6xl md:text-8xl font-black mb-6 leading-tight">
-              Farm the Next <br />
-              <span className="text-gradient">1000x</span> Memecoin
-            </h1>
-            <p className="text-xl text-gray-400 mb-10 max-w-xl mx-auto md:mx-0">
-              The ultimate platform to launch, farm, and track the most explosive memecoins on Solana. Direct liquidity, no rugs, pure gains.
-            </p>
-            
-            <div className="flex flex-col sm:flex-row items-center gap-4 justify-center md:justify-start">
-              <button className="btn-premium px-8 py-4 rounded-2xl font-black text-lg shadow-2xl shadow-pink-500/20 flex items-center gap-2 w-full sm:w-auto">
-                <Rocket className="w-5 h-5" />
-                Launch Coin
-              </button>
-              <button className="px-8 py-4 rounded-2xl font-black text-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-all w-full sm:w-auto">
-                Explore Coins
-              </button>
-            </div>
-          </motion.div>
-
-          <div className="mt-12 flex flex-wrap items-center gap-8 justify-center md:justify-start opacity-60">
-            <StatItem icon={<TrendingUp size={20} />} label="Total Volume" value="$24.2M" />
-            <StatItem icon={<ShieldCheck size={20} />} label="Security" value="Rug-Proof" />
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-cyan-400">Institutional Grade Discovery</span>
           </div>
-        </div>
+          
+          <h1 className="text-5xl md:text-7xl font-black mb-8 leading-[1.1] tracking-tight text-white">
+            The Hub for <br />
+            <span className="text-gradient">Explosive</span> Memes
+          </h1>
+          
+          <p className="text-lg text-slate-400 mb-12 max-w-xl leading-relaxed">
+            A high-performance discovery and farming engine powered by real-time DEX analytics. Track the smart money, launch with integrity, and farm at scale.
+          </p>
+          
+          <div className="flex flex-col sm:flex-row items-center gap-4">
+            <button className="btn-premium px-10 py-4 rounded-xl font-bold text-sm uppercase tracking-widest flex items-center gap-3">
+              <Rocket size={18} />
+              Explore Markets
+            </button>
+            <button className="px-10 py-4 rounded-xl font-bold text-sm uppercase tracking-widest bg-white/5 border border-white/5 hover:bg-white/10 transition-all text-slate-300">
+              Latest Alpha
+            </button>
+          </div>
+        </motion.div>
 
-        <div className="flex-1 relative">
+        <div className="relative group">
           <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
+            initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="relative z-10"
+            transition={{ duration: 1, delay: 0.2 }}
+            className="relative z-10 p-4 glass rounded-[2.5rem] border-white/5 shadow-2xl"
           >
+            <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-blue-600/10 rounded-[2.5rem] -z-10"></div>
             <img 
-              src="https://img.freepik.com/free-vector/gradient-liquid-shapes-background_23-2148937989.jpg" 
-              alt="Meme character growing" 
-              className="w-full max-w-lg mx-auto rounded-3xl shadow-2xl shadow-purple-500/20"
+              src="https://img.freepik.com/free-photo/view-futuristic-3d-rocket-launch_23-2150912163.jpg?t=st=1710143825&exp=1710147425&hmac=7f717c1a2e7c0b0b8c9e2c4c8c9e2c4c8c9e2c4" 
+              alt="Meme Alpha" 
+              className="w-full h-[400px] object-cover rounded-[2rem] opacity-80 mix-blend-screen"
             />
-            {/* Overlay cards */}
+            {/* Real-time floating stat */}
             <motion.div 
-              animate={{ y: [0, -10, 0] }}
-              transition={{ repeat: Infinity, duration: 4 }}
-              className="absolute -top-10 -right-10 glass p-6 rounded-2xl border-pink-500/30"
+              animate={{ y: [0, -8, 0] }}
+              transition={{ repeat: Infinity, duration: 5, ease: "easeInOut" }}
+              className="absolute -bottom-6 -right-6 glass p-6 rounded-2xl border-white/10 shadow-2xl bg-slate-900/90"
             >
-              <div className="text-pink-500 font-black text-xl">+1,240%</div>
-              <div className="text-xs text-gray-400">Trending: $PEPE 2.0</div>
+              <div className="flex items-center gap-2 mb-1">
+                <Zap className="text-cyan-400 w-4 h-4" />
+                <span className="text-[10px] font-bold text-slate-500 uppercase">Live Hotness</span>
+              </div>
+              <div className="text-2xl font-black text-white">99.8<span className="text-cyan-400">%</span></div>
+              <div className="text-[10px] text-slate-400">Sentiment Score</div>
             </motion.div>
           </motion.div>
           
-          {/* Background circles */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-purple-600/20 blur-[100px] rounded-full -z-10 animate-pulse"></div>
+          {/* Subtle Background Glows */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[140%] h-[140%] bg-cyan-600/5 blur-[120px] rounded-full -z-10"></div>
         </div>
+      </div>
+      
+      <div className="max-w-7xl mx-auto mt-24 pt-12 border-t border-white/5 grid grid-cols-2 md:grid-cols-4 gap-8">
+        <StatItem icon={<TrendingUp size={16} />} label="Daily Volume" value="$42.5M" color="cyan" />
+        <StatItem icon={<ShieldCheck size={16} />} label="Security Score" value="9.8 / 10" color="blue" />
+        <StatItem icon={<Zap size={16} />} label="Active Pools" value="1,248" color="teal" />
+        <StatItem icon={<Rocket size={16} />} label="Launched" value="8.4K+" color="sky" />
       </div>
     </div>
   );
 };
 
-const StatItem = ({ icon, label, value }) => (
-  <div className="flex items-center gap-2">
-    <div className="text-pink-500">{icon}</div>
-    <div>
-      <div className="text-xs text-gray-400 uppercase tracking-tighter">{label}</div>
-      <div className="text-white font-bold">{value}</div>
+const StatItem = ({ icon, label, value, color }) => (
+  <div className="space-y-1">
+    <div className="flex items-center gap-2 text-slate-500">
+      {icon}
+      <span className="text-[10px] font-bold uppercase tracking-widest">{label}</span>
     </div>
+    <div className="text-xl font-bold text-white pl-6">{value}</div>
   </div>
 );
 

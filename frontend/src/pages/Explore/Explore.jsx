@@ -1,146 +1,180 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Search, Filter, TrendingUp, Clock, BarChart3, Users } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Search, Filter, TrendingUp, BarChart3, Info, ExternalLink, Zap } from 'lucide-react';
+import axios from 'axios';
 
 const Explore = () => {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [coins, setCoins] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [activeFilter, setActiveFilter] = useState('Trending');
 
   const filters = ['Trending', 'New', 'Most Traded', 'Highest Cap'];
 
-  const coins = [
-    {
-      logo: "https://cryptologos.cc/logos/pepe-pepe-logo.png",
-      name: "Pepe 2.0",
-      ticker: "PEPE2",
-      price: "$0.00000014",
-      mcap: "$52.4M",
-      liquidity: "$4.1M",
-      holders: "12,400",
-      growth: "+140.5%",
-      tags: ["Meme", "PEPE"]
-    },
-    {
-      logo: "https://cryptologos.cc/logos/solana-sol-logo.png",
-      name: "Solana Inu",
-      ticker: "SOLINU",
-      price: "$0.0042",
-      mcap: "$8.2M",
-      liquidity: "$1.2M",
-      holders: "3,100",
-      growth: "-5.2%",
-      tags: ["Solana", "AI"]
-    },
-    {
-      logo: "https://cryptologos.cc/logos/dogecoin-doge-logo.png",
-      name: "Gigachad Inu",
-      ticker: "GIGA",
-      price: "$0.0024",
-      mcap: "$12.1M",
-      liquidity: "$2.5M",
-      holders: "4,200",
-      growth: "+42.2%",
-      tags: ["Meme", "Giga"]
-    },
-    {
-      logo: "https://cryptologos.cc/logos/shiba-inu-shib-logo.png",
-      name: "Moon Shib",
-      ticker: "MSHIB",
-      price: "$0.000012",
-      mcap: "$8.7M",
-      liquidity: "$900K",
-      holders: "8,100",
-      growth: "+15.8%",
-      tags: ["Meme"]
+  const fetchCoins = async (query = 'SOL') => {
+    setLoading(true);
+    try {
+      const response = await axios.get(`http://localhost:5000/api/dex/search?q=${query}`);
+      const mappedCoins = (response.data.pairs || []).map(pair => ({
+        name: pair.baseToken.name,
+        symbol: pair.baseToken.symbol,
+        price: `$${parseFloat(pair.priceUsd).toFixed(6)}`,
+        change: `${pair.priceChange?.h24 > 0 ? '+' : ''}${pair.priceChange?.h24 || 0}%`,
+        marketCap: `$${(pair.fdv || 0).toLocaleString()}`,
+        liquidity: `$${(pair.liquidity?.usd || 0).toLocaleString()}`,
+        tags: [pair.dexId, pair.chainId],
+        image: pair.info?.imageUrl,
+        url: pair.url,
+        address: pair.baseToken.address
+      }));
+      setCoins(mappedCoins);
+    } catch (error) {
+      console.error('Search failed:', error);
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
+
+  useEffect(() => {
+    fetchCoins('SOL'); 
+  }, []);
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      fetchCoins(searchQuery);
+    }
+  };
 
   return (
-    <div className="pt-32 pb-20 px-6 max-w-7xl mx-auto">
-      <div className="flex flex-col md:flex-row items-center justify-between gap-8 mb-12">
-        <div>
-          <h1 className="text-5xl font-black mb-4">Explore <span className="text-gradient">Coins</span></h1>
-          <p className="text-gray-400">Discover the next gem before it moons.</p>
+    <div className="min-h-screen pt-40 pb-24 px-6">
+      <div className="max-w-7xl mx-auto">
+        <div className="text-left mb-16">
+          <motion.h1 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-5xl md:text-6xl font-black mb-6 text-white tracking-tight"
+          >
+            Market <span className="text-gradient">Intelligence</span>
+          </motion.h1>
+          <p className="text-slate-400 text-lg max-w-2xl">
+            Real-time multi-chain discovery engine. Aggregate data from top DEXs to find the next alpha.
+          </p>
         </div>
 
-        <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
-          <div className="relative w-full sm:w-80">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 w-5 h-5" />
+        {/* Search and Filter Bar */}
+        <div className="flex flex-col lg:flex-row gap-6 mb-16">
+          <form onSubmit={handleSearch} className="flex-1 relative group">
+            <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-cyan-400 transition-colors" size={20} />
             <input 
               type="text" 
-              placeholder="Search by name or ticker..."
-              className="w-full bg-white/5 border border-white/10 rounded-2xl pl-12 pr-6 py-4 outline-none focus:border-pink-500/50 transition-all"
+              placeholder="Search assets by name or contract address..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full glass border border-white/5 rounded-2xl py-6 pl-16 pr-8 focus:outline-none focus:border-cyan-500/30 focus:bg-white/5 transition-all font-bold text-sm tracking-wide text-white placeholder:text-slate-600"
             />
+          </form>
+          <div className="flex gap-2 overflow-x-auto pb-2 lg:pb-0 scrollbar-hide">
+            {filters.map(filter => (
+              <button
+                key={filter}
+                onClick={() => setActiveFilter(filter)}
+                className={`px-8 py-5 rounded-2xl border whitespace-nowrap transition-all font-bold text-xs uppercase tracking-widest ${
+                  activeFilter === filter 
+                    ? 'bg-cyan-500 border-cyan-500 text-slate-950 shadow-xl shadow-cyan-500/20' 
+                    : 'bg-white/5 border-white/10 text-slate-500 hover:text-slate-300'
+                }`}
+              >
+                {filter}
+              </button>
+            ))}
           </div>
-          <button className="glass px-6 py-4 rounded-2xl flex items-center gap-2 font-bold hover:bg-white/10 transition-all border-white/5 whitespace-nowrap">
-            <Filter size={20} /> Filters
-          </button>
         </div>
-      </div>
 
-      <div className="flex items-center gap-2 mb-10 overflow-x-auto pb-4 scrollbar-hide">
-        {filters.map(filter => (
-          <button
-            key={filter}
-            onClick={() => setActiveFilter(filter)}
-            className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all whitespace-nowrap ${
-              activeFilter === filter 
-                ? 'bg-pink-500 text-white' 
-                : 'bg-white/5 text-gray-400 hover:bg-white/10'
-            }`}
-          >
-            {filter}
-          </button>
-        ))}
-      </div>
+        {/* Coin Grid */}
+        {loading ? (
+          <div className="py-24 text-center">
+            <div className="animate-spin w-12 h-12 border-4 border-cyan-500 border-t-transparent rounded-full mx-auto mb-6"></div>
+            <p className="text-slate-500 font-bold uppercase tracking-widest text-xs">Querying Global Indices...</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <AnimatePresence mode="popLayout">
+              {coins.map((coin, index) => (
+                <motion.div
+                  key={coin.address + index}
+                  layout
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  className="glass p-8 rounded-[2rem] border-white/5 relative group hover:border-cyan-500/20 transition-all card-hover"
+                >
+                  <div className="flex items-start gap-4 mb-8">
+                    <div className="w-14 h-14 rounded-xl bg-slate-800 flex items-center justify-center font-black text-cyan-400 text-lg overflow-hidden border border-white/5 group-hover:scale-110 transition-transform">
+                      {coin.image ? (
+                        <img 
+                          src={coin.image} 
+                          alt={coin.name} 
+                          className="w-full h-full object-cover" 
+                          onError={(e) => { e.target.onerror = null; e.target.src=`https://ui-avatars.com/api/?name=${coin.symbol}&background=0f172a&color=2dd4bf` }}
+                        />
+                      ) : (
+                        <Zap size={24} />
+                      )}
+                    </div>
+                    <div className="flex-1 overflow-hidden">
+                      <h3 className="text-xl font-bold text-white group-hover:text-cyan-400 transition-colors truncate">{coin.name}</h3>
+                      <div className="flex gap-2 mt-1">
+                        <span className="text-[10px] uppercase font-black text-cyan-500/50 bg-cyan-500/5 px-2 py-0.5 rounded-md border border-cyan-500/10">
+                          {coin.symbol}
+                        </span>
+                        <span className="text-[10px] uppercase font-black text-slate-600 px-2 py-0.5 rounded-md border border-white/5">
+                          {coin.tags[0]}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {coins.map((coin, index) => (
-          <motion.div
-            key={index}
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: index * 0.05 }}
-            whileHover={{ y: -5 }}
-            className="glass p-6 rounded-[2rem] border-white/5 group"
-          >
-            <div className="flex items-center gap-3 mb-6">
-              <img src={coin.logo} alt={coin.name} className="w-12 h-12 rounded-xl shadow-lg" />
-              <div>
-                <h3 className="font-bold leading-none mb-1 group-hover:text-pink-500 transition-colors">{coin.name}</h3>
-                <span className="text-[10px] font-mono text-gray-500 uppercase">{coin.ticker}</span>
-              </div>
-              <div className={`ml-auto text-xs font-black ${coin.growth.startsWith('+') ? 'text-green-400' : 'text-red-400'}`}>
-                {coin.growth}
-              </div>
-            </div>
+                  <div className="grid grid-cols-2 gap-4 mb-8">
+                    <div className="p-4 bg-white/5 rounded-2xl border border-white/5">
+                      <div className="text-[10px] text-slate-500 uppercase font-black mb-1 flex items-center gap-1"><TrendingUp size={10}/> Valuation</div>
+                      <div className="font-bold text-white">{coin.price}</div>
+                    </div>
+                    <div className="p-4 bg-white/5 rounded-2xl border border-white/5 text-right">
+                      <div className="text-[10px] text-slate-500 uppercase font-black mb-1">24h Volatility</div>
+                      <div className={`font-bold ${coin.change.startsWith('+') ? 'text-emerald-400' : 'text-rose-400'}`}>
+                        {coin.change}
+                      </div>
+                    </div>
+                  </div>
 
-            <div className="space-y-3 mb-6">
-              <StatRow label="Price" value={coin.price} />
-              <StatRow label="Market Cap" value={coin.mcap} />
-              <StatRow label="Liquidity" value={coin.liquidity} />
-            </div>
+                  <div className="grid grid-cols-2 gap-6 p-6 bg-slate-800/40 rounded-3xl mb-8 border border-white/5">
+                    <div>
+                      <div className="text-[10px] uppercase font-black text-slate-500 mb-1">FDV</div>
+                      <div className="font-bold text-sm text-slate-200">{coin.marketCap}</div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-[10px] uppercase font-black text-slate-500 mb-1">Liquidity</div>
+                      <div className="font-bold text-sm text-slate-200">{coin.liquidity}</div>
+                    </div>
+                  </div>
 
-            <div className="flex gap-2 mb-6">
-              {coin.tags.map(tag => (
-                <span key={tag} className="text-[10px] bg-white/5 px-2 py-0.5 rounded text-gray-400">{tag}</span>
+                  <a 
+                    href={coin.url} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="w-full py-5 rounded-2xl bg-white/5 border border-white/5 font-bold text-xs uppercase tracking-[0.2em] text-slate-400 flex items-center justify-center gap-2 hover:bg-cyan-500 hover:text-slate-950 transition-all"
+                  >
+                    View Detail Matrix <ExternalLink size={16} />
+                  </a>
+                </motion.div>
               ))}
-            </div>
-
-            <button className="w-full bg-white/5 hover:bg-pink-500 transition-all py-3 rounded-xl font-bold text-sm">
-              View Details
-            </button>
-          </motion.div>
-        ))}
+            </AnimatePresence>
+          </div>
+        )}
       </div>
     </div>
   );
 };
-
-const StatRow = ({ label, value }) => (
-  <div className="flex justify-between items-center text-xs">
-    <span className="text-gray-500">{label}</span>
-    <span className="text-white font-medium">{value}</span>
-  </div>
-);
 
 export default Explore;

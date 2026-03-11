@@ -1,55 +1,56 @@
 import React from 'react';
-import { Rocket, Twitter, MessageCircle, Github, Book } from 'lucide-react';
+import { Twitter, Github, Linkedin, Shield, Info, ExternalLink } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const Footer = () => {
   return (
-    <footer className="py-20 px-6 border-t border-white/5 bg-black">
-      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12">
-        <div className="md:col-span-2">
-          <div className="flex items-center gap-2 mb-6">
-            <div className="p-2 bg-gradient-to-br from-pink-500 to-purple-600 rounded-xl shadow-lg shadow-pink-500/20">
-              <Rocket className="text-white w-6 h-6" />
-            </div>
-            <span className="text-2xl font-bold tracking-tight text-white">
-              Meme<span className="text-pink-500">Farm</span>
+    <footer className="py-24 px-6 border-t border-white/5 bg-[#0a0a0b] relative overflow-hidden">
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[1px] bg-gradient-to-r from-transparent via-cyan-500/20 to-transparent"></div>
+      
+      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-16 relative z-10">
+        <div className="md:col-span-2 space-y-8">
+          <div className="flex items-center gap-4">
+            <img src="/favicon.png" alt="MemeFarm Logo" className="w-10 h-10 object-contain" />
+            <span className="text-2xl font-black tracking-tight text-white uppercase tracking-widest">
+              Meme<span className="text-cyan-500">Farm</span>
             </span>
           </div>
-          <p className="text-gray-400 max-w-sm mb-8 leading-relaxed">
-            The premium memecoin farming platform. Launch, farm, and grow your meme empire with confidence. Powered by Solana.
+          <p className="text-slate-500 max-w-sm leading-relaxed font-medium text-sm">
+            Institutional-grade liquidity provisioning and asset discovery for the next generation of decentralized finance. Powered by the Solana network.
           </p>
           <div className="flex items-center gap-4">
-            <SocialIcon icon={<Twitter size={20} />} href="#" />
-            <SocialIcon icon={<MessageCircle size={20} />} href="#" />
-            <SocialIcon icon={<Github size={20} />} href="#" />
-            <SocialIcon icon={<Book size={20} />} href="#" />
+            <SocialIcon icon={<Twitter size={18} />} href="https://x.com/GigaChadTokem" />
+            <SocialIcon icon={<Github size={18} />} href="https://github.com/DevD-bot" />
           </div>
         </div>
 
         <div>
-          <h4 className="text-white font-bold mb-6">Platform</h4>
-          <ul className="space-y-4 text-gray-500 text-sm">
-            <li><a href="#" className="hover:text-pink-500 transition-colors">Explore Coins</a></li>
-            <li><a href="#" className="hover:text-pink-500 transition-colors">Farming Pools</a></li>
-            <li><a href="#" className="hover:text-pink-500 transition-colors">Leaderboard</a></li>
-            <li><a href="#" className="hover:text-pink-500 transition-colors">Tokenomics</a></li>
+          <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-8">Ecosystem</h4>
+          <ul className="space-y-4 text-slate-500 text-xs font-bold uppercase tracking-widest">
+            <li><Link to="/explore" className="hover:text-cyan-400 transition-colors">Asset Index</Link></li>
+            <li><Link to="/launch" className="hover:text-cyan-400 transition-colors">Launch Matrix</Link></li>
+            <li><Link to="/dashboard" className="hover:text-cyan-400 transition-colors">Portfolio Node</Link></li>
           </ul>
         </div>
 
         <div>
-          <h4 className="text-white font-bold mb-6">Resources</h4>
-          <ul className="space-y-4 text-gray-500 text-sm">
-            <li><a href="#" className="hover:text-pink-500 transition-colors">Documentation</a></li>
-            <li><a href="#" className="hover:text-pink-500 transition-colors">Security Whitepaper</a></li>
-            <li><a href="#" className="hover:text-pink-500 transition-colors">Brand Assets</a></li>
-            <li><a href="#" className="hover:text-pink-500 transition-colors">Support</a></li>
+          <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-8">Governance</h4>
+          <ul className="space-y-4 text-slate-500 text-xs font-bold uppercase tracking-widest">
+            <li><Link to="/docs" className="hover:text-cyan-400 transition-colors">Resources</Link></li>
+            <li><a href="#" className="hover:text-cyan-400 transition-colors">Security Audit</a></li>
+            <li><a href="#" className="hover:text-cyan-400 transition-colors">Brand Assets</a></li>
           </ul>
         </div>
       </div>
-      <div className="max-w-7xl mx-auto mt-20 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-600">
-        <p>&copy; 2026 MemeFarm. All rights reserved.</p>
+
+      <div className="max-w-7xl mx-auto mt-24 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6 text-[10px] font-bold uppercase tracking-[0.1em] text-slate-600">
+        <div className="flex items-center gap-2">
+          <Shield size={12} className="text-cyan-500/30" />
+          <span>&copy; 2026 MEMEFARM PROTOCOL. ALL RIGHTS RESERVED.</span>
+        </div>
         <div className="flex gap-8">
-          <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
-          <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
+          <a href="#" className="hover:text-slate-400 transition-colors">Privacy Oracle</a>
+          <a href="#" className="hover:text-slate-400 transition-colors">Service Terms</a>
         </div>
       </div>
     </footer>
@@ -59,7 +60,9 @@ const Footer = () => {
 const SocialIcon = ({ icon, href }) => (
   <a 
     href={href} 
-    className="p-3 bg-white/5 rounded-xl text-gray-400 hover:bg-pink-500/20 hover:text-pink-500 transition-all"
+    target="_blank"
+    rel="noreferrer"
+    className="w-10 h-10 bg-white/5 border border-white/5 rounded-xl flex items-center justify-center text-slate-500 hover:bg-cyan-500 hover:text-slate-950 hover:border-cyan-500 transition-all cursor-pointer"
   >
     {icon}
   </a>

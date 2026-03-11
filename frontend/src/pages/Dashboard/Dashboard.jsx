@@ -1,136 +1,194 @@
-import React from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { Wallet, Coins, Pickaxe, TrendingUp, ArrowUpRight, PlusCircle } from 'lucide-react';
+import { Wallet, Coins, Pickaxe, TrendingUp, ArrowUpRight, PlusCircle, RefreshCw } from 'lucide-react';
+import axios from 'axios';
 
 const Dashboard = () => {
-  const stats = [
-    { label: 'Wallet Balance', value: '14.5 SOL', icon: <Wallet className="text-pink-500" />, change: '+2.4%' },
-    { label: 'Tokens Owned', value: '12', icon: <Coins className="text-purple-500" />, change: 'Stable' },
-    { label: 'Farming Rewards', value: '1.2M PEPE2', icon: <Pickaxe className="text-yellow-500" />, change: '+12%' },
-    { label: 'Total ROI', value: '+420%', icon: <TrendingUp className="text-green-500" />, change: '+5.1%' }
+  const [trackedCoins, setTrackedCoins] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+
+  // Default addresses if none in localStorage
+  const DEFAULT_TRACKED = [
+    'So11111111111111111111111111111111111111112', // SOL
+    'JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN', // JUP
+    'EKpQGSJtjMFqKZ9KQanAtss7Yde646kkZXYAtbLD'  // WIF
   ];
 
-  const myCoins = [
-    { name: 'Pepe 2.0', ticker: 'PEPE2', balance: '1.2M', value: '$168.00', profit: '+$42.00' },
-    { name: 'Gigachad Inu', ticker: 'GIGA', balance: '4,500', value: '$10.80', profit: '-$2.10' }
+  const fetchPortfolio = useCallback(async (isManual = false) => {
+    if (isManual) setRefreshing(true);
+    else setLoading(true);
+
+    try {
+      const stored = localStorage.getItem('tracked_tokens');
+      const addresses = stored ? JSON.parse(stored) : DEFAULT_TRACKED;
+      
+      const response = await axios.get(`http://localhost:5000/api/dex/tokens/${addresses.join(',')}`);
+      const pairs = response.data.pairs || [];
+      
+      const mapped = pairs.map(pair => ({
+        name: pair.baseToken.name,
+        ticker: pair.baseToken.symbol,
+        balance: (Math.random() * 500 + 10).toFixed(1), // Simulated balance
+        value: `$${parseFloat(pair.priceUsd).toFixed(2)}`,
+        profit: `${pair.priceChange?.h24 > 0 ? '+' : ''}${pair.priceChange?.h24 || 0}%`,
+        address: pair.baseToken.address
+      }));
+      setTrackedCoins(mapped);
+    } catch (error) {
+      console.error('Failed to fetch portfolio data:', error);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchPortfolio();
+    const interval = setInterval(() => fetchPortfolio(), 60000);
+    return () => clearInterval(interval);
+  }, [fetchPortfolio]);
+
+  const stats = [
+    { label: 'Network Value', value: '14.5 SOL', icon: <Wallet className="text-cyan-400" />, change: '+2.4%' },
+    { label: 'Active Assets', value: trackedCoins.length.toString(), icon: <Coins className="text-blue-400" />, change: 'Live' },
+    { label: 'Staking Rewards', value: '1.2M PEPE2', icon: <Pickaxe className="text-teal-400" />, change: '+12.5%' },
+    { label: 'Market Volatility', value: '78.2', icon: <TrendingUp className="text-emerald-400" />, change: 'High' }
   ];
 
   return (
-    <div className="pt-32 pb-20 px-6 max-w-7xl mx-auto">
-      <div className="flex flex-col md:flex-row items-center justify-between gap-8 mb-12">
+    <div className="pt-40 pb-24 px-6 max-w-7xl mx-auto">
+      <div className="flex flex-col lg:flex-row items-start justify-between gap-8 mb-16">
         <div>
-          <h1 className="text-5xl font-black mb-4">My <span className="text-gradient">Dashboard</span></h1>
-          <p className="text-gray-400">Manage your assets, track farming rewards, and monitor growth.</p>
+          <h1 className="text-5xl font-black mb-4 text-white tracking-tight">Personal <span className="text-gradient">Portfolio</span></h1>
+          <p className="text-slate-400 text-lg">Institutional-grade asset tracking and yield management.</p>
         </div>
-        <div className="flex gap-4">
-          <button className="px-6 py-4 glass rounded-2xl font-bold flex items-center gap-2 hover:bg-white/5 transition-all">
-            <PlusCircle size={20} /> Add Liquidity
+        <div className="flex gap-4 w-full lg:w-auto">
+          <button className="flex-1 lg:flex-none px-8 py-4 glass rounded-xl font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-3 hover:bg-white/5 transition-all outline-none border-white/5">
+            <PlusCircle size={16} /> Track New Asset
           </button>
-          <button className="btn-premium px-8 py-4 rounded-2xl font-black shadow-lg shadow-pink-500/20">
-            Launch New Coin
+          <button className="flex-1 lg:flex-none btn-premium px-10 py-4 rounded-xl font-bold text-xs uppercase tracking-widest shadow-xl">
+            Staking Launchpad
           </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
         {stats.map((stat, index) => (
           <motion.div
             key={index}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
-            className="glass p-6 rounded-3xl border-white/5"
+            className="glass p-8 rounded-3xl border-white/5 relative overflow-hidden group"
           >
-            <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-white/5 rounded-xl">{stat.icon}</div>
-              <span className={`text-xs font-bold ${stat.change.startsWith('+') ? 'text-green-400' : 'text-gray-500'}`}>
+            <div className="absolute top-0 right-0 w-24 h-24 bg-cyan-500/5 blur-[40px] group-hover:bg-cyan-500/10 transition-all"></div>
+            <div className="flex items-center justify-between mb-6">
+              <div className="p-3 bg-slate-800 rounded-xl border border-white/5">{stat.icon}</div>
+              <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-md ${stat.change.startsWith('+') ? 'bg-emerald-500/10 text-emerald-400' : 'bg-slate-500/10 text-slate-500'}`}>
                 {stat.change}
               </span>
             </div>
-            <div className="text-xs text-gray-500 uppercase tracking-wider mb-1">{stat.label}</div>
-            <div className="text-2xl font-black">{stat.value}</div>
+            <div className="text-[10px] text-slate-500 uppercase font-black tracking-[0.2em] mb-1">{stat.label}</div>
+            <div className="text-2xl font-black text-white">{stat.value}</div>
           </motion.div>
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
         {/* Assets Table */}
         <div className="lg:col-span-2 glass rounded-[2.5rem] border-white/5 overflow-hidden">
           <div className="p-8 border-b border-white/5 flex items-center justify-between">
-            <h2 className="text-xl font-bold">My Meme Coins</h2>
-            <button className="text-pink-500 text-sm font-bold">View History</button>
+            <h2 className="text-xl font-bold text-white">Live Asset Pipeline</h2>
+            <button 
+              onClick={() => fetchPortfolio(true)}
+              disabled={refreshing}
+              className="text-cyan-400 text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-2 hover:text-cyan-300 transition-all disabled:opacity-50"
+            >
+              <RefreshCw size={14} className={refreshing ? 'animate-spin' : ''} />
+              {refreshing ? 'Synchronizing...' : 'Refresh Matrix'}
+            </button>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead>
-                <tr className="text-xs text-gray-500 uppercase border-b border-white/5">
-                  <th className="px-8 py-4">Asset</th>
-                  <th className="px-8 py-4">Balance</th>
-                  <th className="px-8 py-4">Value</th>
-                  <th className="px-8 py-4">Profit/Loss</th>
-                  <th className="px-8 py-4">Actions</th>
+                <tr className="text-[10px] text-slate-500 font-black uppercase tracking-[0.2em] border-b border-white/5">
+                  <th className="px-8 py-6">Asset Specification</th>
+                  <th className="px-8 py-6">Volume</th>
+                  <th className="px-8 py-6">Unit Value</th>
+                  <th className="px-8 py-6">Performance</th>
+                  <th className="px-8 py-6 text-right">Action</th>
                 </tr>
               </thead>
               <tbody className="text-sm">
-                {myCoins.map((coin, index) => (
-                  <tr key={index} className="border-b border-white/5 hover:bg-white/5 transition-all cursor-pointer group">
-                    <td className="px-8 py-6">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-pink-500/20 flex items-center justify-center font-black text-[10px] text-pink-500">
-                          {coin.ticker[0]}
-                        </div>
-                        <div>
-                          <p className="font-bold">{coin.name}</p>
-                          <p className="text-[10px] text-gray-500">{coin.ticker}</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-8 py-6 font-mono font-medium">{coin.balance}</td>
-                    <td className="px-8 py-6 font-bold">{coin.value}</td>
-                    <td className={`px-8 py-6 font-bold ${coin.profit.startsWith('+') ? 'text-green-400' : 'text-red-400'}`}>
-                      {coin.profit}
-                    </td>
-                    <td className="px-8 py-6">
-                      <button className="p-2 hover:bg-pink-500/10 rounded-lg text-gray-500 hover:text-pink-500 transition-all">
-                        <ArrowUpRight size={18} />
-                      </button>
-                    </td>
+                {loading ? (
+                  <tr>
+                    <td colSpan="5" className="px-8 py-20 text-center text-slate-500 font-medium">Accessing decentralized data nodes...</td>
                   </tr>
-                ))}
+                ) : (
+                  trackedCoins.map((coin, index) => (
+                    <tr key={index} className="border-b border-white/5 hover:bg-white/5 transition-all cursor-pointer group">
+                      <td className="px-8 py-8">
+                        <div className="flex items-center gap-4">
+                          <div className="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center font-black text-[10px] text-cyan-400 uppercase border border-white/5">
+                            {coin.ticker[0]}
+                          </div>
+                          <div>
+                            <p className="font-bold text-white">{coin.name}</p>
+                            <p className="text-[10px] text-slate-500 font-mono truncate max-w-[120px] uppercase">{coin.address}</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-8 py-8 font-mono text-slate-300">{coin.balance} <span className="text-slate-600 font-bold">{coin.ticker}</span></td>
+                      <td className="px-8 py-8 font-black text-white">{coin.value}</td>
+                      <td className={`px-8 py-8 font-black ${coin.profit.startsWith('+') ? 'text-emerald-400' : 'text-rose-400'}`}>
+                        {coin.profit}
+                      </td>
+                      <td className="px-8 py-8 text-right">
+                        <button className="p-3 bg-white/5 rounded-xl text-slate-500 hover:text-cyan-400 hover:border-cyan-400/20 transition-all border border-transparent">
+                          <ArrowUpRight size={18} />
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
         </div>
 
-        {/* Farming Summary */}
-        <div className="glass rounded-[2.5rem] border-white/5 p-8 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/10 blur-[80px] -z-10"></div>
-          <h2 className="text-xl font-bold mb-8">Farming Activity</h2>
-          
-          <div className="space-y-6">
-            <div className="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-pink-500/20 flex items-center justify-center">
-                  <TrendingUp className="text-pink-500 w-5 h-5" />
+        {/* Global Stats Overlay */}
+        <div className="glass rounded-[2.5rem] border-white/5 p-10 relative overflow-hidden flex flex-col justify-between">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 blur-[100px] -z-10"></div>
+          <div>
+            <h2 className="text-xl font-bold text-white mb-10">Intelligence Report</h2>
+            <div className="space-y-6">
+              <div className="flex items-center justify-between p-5 bg-white/5 rounded-2xl border border-white/5 group hover:bg-white/10 transition-all">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-cyan-500/10 flex items-center justify-center border border-cyan-500/20">
+                    <TrendingUp className="text-cyan-400 w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-slate-500 uppercase font-black">Cluster Status</p>
+                    <p className="font-bold text-white text-sm">3 Operational Pools</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-xs text-gray-500">Active Pools</p>
-                  <p className="font-bold">3 Pools</p>
-                </div>
+                <ArrowUpRight size={16} className="text-slate-600 group-hover:text-cyan-400 transition-colors" />
               </div>
-              <button className="text-xs font-bold text-pink-500">Manage</button>
-            </div>
 
-            <div className="p-6 bg-gradient-to-br from-pink-500/10 to-purple-600/10 rounded-3xl border border-pink-500/20">
-              <p className="text-xs text-gray-400 uppercase tracking-tighter mb-1">Total Rewards Earned</p>
-              <h3 className="text-3xl font-black mb-4">$4,280.50</h3>
-              <button className="w-full btn-premium py-3 rounded-xl font-bold text-sm">
-                Harvest All
-              </button>
+              <div className="p-8 bg-gradient-to-br from-slate-800 to-slate-900 rounded-[2rem] border border-white/5 shadow-2xl">
+                <p className="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-2">Aggregate Yield</p>
+                <h3 className="text-4xl font-black text-white mb-6 tracking-tighter">$4,280.50</h3>
+                <button className="w-full btn-premium py-4 rounded-xl font-bold text-xs uppercase tracking-widest shadow-lg active:scale-95 transition-transform">
+                  Harvest Yield matrix
+                </button>
+              </div>
             </div>
-            
-            <p className="text-xs text-gray-500 text-center leading-relaxed">
-              Auto-harvesting is enabled for GIGA pools. Rewards are distributed every 6 hours.
+          </div>
+          
+          <div className="mt-8 text-center">
+            <p className="text-[10px] text-slate-600 leading-relaxed font-medium">
+              Automated yield distribution is synchronized with the Solana blockchain. Rewards are distributed at the end of each epoch.
             </p>
           </div>
         </div>

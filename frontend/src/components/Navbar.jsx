@@ -1,40 +1,58 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { Rocket, LayoutDashboard, Search, Trophy, BookOpen } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Rocket, LayoutDashboard, Compass, Send, Book, Wallet } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
 
 const Navbar = () => {
+  const location = useLocation();
+
+  const navItems = [
+    { name: 'Dashboard', icon: <LayoutDashboard size={18} />, path: '/dashboard' },
+    { name: 'Explore', icon: <Compass size={18} />, path: '/explore' },
+    { name: 'Launch', icon: <Send size={18} />, path: '/launch' },
+    { name: 'Resources', icon: <Book size={18} />, path: '/docs' },
+  ];
+
   return (
-    <nav className="fixed top-0 left-0 w-full z-50 glass border-b border-white/10 px-6 py-4">
+    <nav className="fixed top-0 left-0 right-0 z-50 px-6 py-6 border-b border-white/5 bg-[#0a0a0b]/80 backdrop-blur-xl">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-2 cursor-pointer">
-          <div className="p-2 bg-gradient-to-br from-pink-500 to-purple-600 rounded-xl shadow-lg shadow-pink-500/20">
-            <Rocket className="text-white w-6 h-6" />
-          </div>
-          <span className="text-2xl font-bold tracking-tight text-white">
-            Meme<span className="text-pink-500">Farm</span>
+        <Link to="/" className="flex items-center gap-4 hover:opacity-80 transition-opacity">
+          <img src="/favicon.png" alt="MemeFarm Logo" className="w-10 h-10 object-contain" />
+          <span className="text-2xl font-black tracking-tighter text-white uppercase tracking-widest hidden md:block">
+            Meme<span className="text-cyan-500">Farm</span>
           </span>
         </Link>
 
-        <div className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-400">
-          <NavItem to="/dashboard" icon={<LayoutDashboard size={18} />} label="Dashboard" />
-          <NavItem to="/launch" icon={<Rocket size={18} />} label="Launch" />
-          <NavItem to="/explore" icon={<Search size={18} />} label="Explore" />
-          <NavItem to="/leaderboard" icon={<Trophy size={18} />} label="Leaderboard" />
-          <NavItem to="/docs" icon={<BookOpen size={18} />} label="Docs" />
+        <div className="hidden lg:flex items-center gap-2 bg-slate-900/50 p-1.5 rounded-2xl border border-white/5">
+          {navItems.map((item) => (
+            <NavItem 
+              key={item.name} 
+              {...item} 
+              isActive={location.pathname === item.path} 
+            />
+          ))}
         </div>
 
-        <button className="btn-premium px-6 py-2.5 rounded-full font-bold text-sm shadow-xl hover:scale-105 transition-all">
-          Connect Wallet
+        <button className="flex items-center gap-3 px-8 py-3.5 bg-cyan-500 rounded-xl font-black text-xs uppercase tracking-widest text-slate-950 hover:bg-cyan-400 hover:shadow-lg hover:shadow-cyan-500/20 transition-all active:scale-95">
+          <Wallet size={16} />
+          <span className="hidden sm:inline">Connect Terminal</span>
         </button>
       </div>
     </nav>
   );
 };
 
-const NavItem = ({ to, icon, label }) => (
-  <Link to={to} className="flex items-center gap-2 hover:text-white transition-colors cursor-pointer group">
-    <span className="group-hover:text-pink-500 transition-colors">{icon}</span>
-    {label}
+const NavItem = ({ name, icon, path, isActive }) => (
+  <Link 
+    to={path} 
+    className={`flex items-center gap-2.5 px-6 py-3 rounded-xl text-xs font-bold uppercase tracking-widest transition-all ${
+      isActive 
+        ? 'bg-slate-800 text-cyan-400 border border-white/5 shadow-inner' 
+        : 'text-slate-500 hover:text-slate-300 hover:bg-white/5'
+    }`}
+  >
+    {icon}
+    <span>{name}</span>
   </Link>
 );
 
