@@ -77,9 +77,16 @@ const Resources = () => {
         <p className="text-slate-400 max-w-xl mx-auto mb-8">
           Join our global community of farmers and developers. Get real-time help and share market alpha.
         </p>
-        <button className="btn-premium px-12 py-4 rounded-xl font-bold text-sm uppercase tracking-widest shadow-xl">
-          Join Official Community
-        </button>
+        <a 
+          href="https://t.me/gigachadtokem" 
+          target="_blank" 
+          rel="noreferrer" 
+          className="inline-block"
+        >
+          <button className="btn-premium px-12 py-4 rounded-xl font-bold text-sm uppercase tracking-widest shadow-xl hover:scale-105 transition-transform">
+            Join Official Community
+          </button>
+        </a>
       </div>
     </div>
   );

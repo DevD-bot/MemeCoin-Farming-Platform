@@ -1,5 +1,11 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react';
+import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
+import { PhantomWalletAdapter, SolflareWalletAdapter } from '@solana/wallet-adapter-wallets';
+import { clusterApiUrl } from '@solana/web3.js';
+import '@solana/wallet-adapter-react-ui/styles.css';
+
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from './pages/Home/Home';
@@ -11,26 +17,41 @@ import Leaderboard from './pages/Leaderboard/Leaderboard';
 import Resources from './pages/Resources/Resources';
 
 function App() {
-  return (
-    <Router>
-      <div className="relative min-h-screen bg-slate-950">
-        <div className="glow-bg" />
-        <Navbar />
-        
-        <main>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/launch" element={<Launch />} />
-            <Route path="/explore" element={<Explore />} />
-            <Route path="/leaderboard" element={<Leaderboard />} />
-            <Route path="/docs" element={<Resources />} />
-          </Routes>
-        </main>
+  const endpoint = useMemo(() => clusterApiUrl('mainnet-beta'), []);
+  const wallets = useMemo(
+    () => [
+      new PhantomWalletAdapter(),
+      new SolflareWalletAdapter(),
+    ],
+    []
+  );
 
-        <Footer />
-      </div>
-    </Router>
+  return (
+    <ConnectionProvider endpoint={endpoint}>
+      <WalletProvider wallets={wallets} autoConnect>
+        <WalletModalProvider>
+          <Router>
+            <div className="relative min-h-screen bg-slate-950">
+              <div className="glow-bg" />
+              <Navbar />
+              
+              <main>
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/launch" element={<Launch />} />
+                  <Route path="/explore" element={<Explore />} />
+                  <Route path="/leaderboard" element={<Leaderboard />} />
+                  <Route path="/docs" element={<Resources />} />
+                </Routes>
+              </main>
+
+              <Footer />
+            </div>
+          </Router>
+        </WalletModalProvider>
+      </WalletProvider>
+    </ConnectionProvider>
   );
 }
 

@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Rocket, LayoutDashboard, Compass, Send, Book, Wallet } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
+import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 
 const Navbar = () => {
   const location = useLocation();
@@ -33,10 +34,7 @@ const Navbar = () => {
           ))}
         </div>
 
-        <button className="flex items-center gap-3 px-8 py-3.5 bg-cyan-500 rounded-xl font-black text-xs uppercase tracking-widest text-slate-950 hover:bg-cyan-400 hover:shadow-lg hover:shadow-cyan-500/20 transition-all active:scale-95">
-          <Wallet size={16} />
-          <span className="hidden sm:inline">Connect Terminal</span>
-        </button>
+        <WalletMultiButton className="!bg-cyan-500 hover:!bg-cyan-400 !text-slate-950 !rounded-xl !font-black !text-xs !uppercase !tracking-widest !px-8 !py-3.5 !h-auto transition-all" />
       </div>
     </nav>
   );

@@ -25,7 +25,8 @@ const Explore = () => {
         tags: [pair.dexId, pair.chainId],
         image: pair.info?.imageUrl,
         url: pair.url,
-        address: pair.baseToken.address
+        address: pair.baseToken.address,
+        createdAt: pair.pairCreatedAt || 0
       }));
       setCoins(mappedCoins);
     } catch (error) {
@@ -45,6 +46,24 @@ const Explore = () => {
       fetchCoins(searchQuery);
     }
   };
+
+  const sortedCoins = [...coins].sort((a, b) => {
+    switch (activeFilter) {
+      case 'Highest Cap':
+        return parseFloat(b.marketCap.replace(/[^0-9.-]+/g,"")) - parseFloat(a.marketCap.replace(/[^0-9.-]+/g,""));
+      case 'Most Traded':
+        return parseFloat(b.liquidity.replace(/[^0-9.-]+/g,"")) - parseFloat(a.liquidity.replace(/[^0-9.-]+/g,""));
+      case 'New':
+        // Assuming newest are returned first or simply shuffle/re-query in a real app
+        // For now, reverse the array to simulate 'New' sorting
+        // we can also sort by a 'pairCreatedAt' timestamp if we add it. Added it below in fetchCoins for robustness.
+        return (b.createdAt || 0) - (a.createdAt || 0);
+      case 'Trending':
+      default:
+        // Default API order is usually trending/relevant
+        return 0; 
+    }
+  });
 
   return (
     <div className="min-h-screen pt-40 pb-24 px-6">
@@ -100,7 +119,7 @@ const Explore = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <AnimatePresence mode="popLayout">
-              {coins.map((coin, index) => (
+              {sortedCoins.map((coin, index) => (
                 <motion.div
                   key={coin.address + index}
                   layout

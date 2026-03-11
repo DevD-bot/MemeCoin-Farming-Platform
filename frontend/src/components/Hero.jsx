@@ -48,11 +48,15 @@ const Hero = () => {
             className="relative z-10 p-4 glass rounded-[2.5rem] border-white/5 shadow-2xl"
           >
             <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-blue-600/10 rounded-[2.5rem] -z-10"></div>
-            <img 
-              src="https://img.freepik.com/free-photo/view-futuristic-3d-rocket-launch_23-2150912163.jpg?t=st=1710143825&exp=1710147425&hmac=7f717c1a2e7c0b0b8c9e2c4c8c9e2c4c8c9e2c4" 
-              alt="Meme Alpha" 
+            <video 
+              autoPlay 
+              loop 
+              muted 
+              playsInline
               className="w-full h-[400px] object-cover rounded-[2rem] opacity-80 mix-blend-screen"
-            />
+            >
+              <source src="/hero.mp4" type="video/mp4" />
+            </video>
             {/* Real-time floating stat */}
             <motion.div 
               animate={{ y: [0, -8, 0] }}

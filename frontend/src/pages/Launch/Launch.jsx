@@ -37,11 +37,25 @@ const Launch = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  const [isDeploying, setIsDeploying] = useState(false);
+
+  const handleDeploy = () => {
+    if (!formData.name || !formData.symbol) {
+      alert("Please fill in the token name and symbol.");
+      return;
+    }
+    setIsDeploying(true);
+    setTimeout(() => {
+      setIsDeploying(false);
+      alert(`Success! ${formData.name} (${formData.symbol}) has been deployed on ${formData.chain}.`);
+    }, 2000);
+  };
+
   const chains = [
-    { name: 'Solana', icon: 'https://cryptologos.cc/logos/solana-sol-logo.png' },
-    { name: 'BSC', icon: 'https://cryptologos.cc/logos/bnb-bnb-logo.png' },
-    { name: 'Base', icon: 'https://avatars.githubusercontent.com/u/108554348?s=200&v=4' },
-    { name: 'Ethereum', icon: 'https://cryptologos.cc/logos/ethereum-eth-logo.png' }
+    { name: 'Solana', icon: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/solana/info/logo.png' },
+    { name: 'BSC', icon: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/smartchain/info/logo.png' },
+    { name: 'Base', icon: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/base/info/logo.png' },
+    { name: 'Ethereum', icon: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/info/logo.png' }
   ];
 
   return (
@@ -107,7 +121,12 @@ const Launch = () => {
                           formData.chain === chain.name ? 'bg-cyan-500/10 border-cyan-500/30' : 'bg-white/5 border-white/5 hover:bg-white/10'
                         }`}
                       >
-                        <img src={chain.icon} alt={chain.name} className="w-5 h-5 grayscale group-hover:grayscale-0 transition-all" />
+                        <img 
+                          src={chain.icon} 
+                          alt={chain.name} 
+                          className="w-5 h-5 grayscale group-hover:grayscale-0 transition-all" 
+                          onError={(e) => { e.target.onerror = null; e.target.src = `https://ui-avatars.com/api/?name=${chain.name}&background=0f172a&color=2dd4bf&rounded=true&size=32`; }}
+                        />
                         <span className={`text-xs font-bold ${formData.chain === chain.name ? 'text-white' : 'text-slate-500'}`}>{chain.name}</span>
                       </div>
                     ))}
@@ -159,9 +178,13 @@ const Launch = () => {
                   </div>
                 </div>
 
-                <button className="w-full btn-premium py-5 rounded-2xl font-black text-xs uppercase tracking-[0.3em] shadow-2xl active:scale-95 transition-transform flex items-center justify-center gap-3">
-                  Initialize {formData.symbol || 'Contract'}
-                  <CheckCircle2 size={20} />
+                <button 
+                  onClick={handleDeploy}
+                  disabled={isDeploying}
+                  className="w-full btn-premium py-5 rounded-2xl font-black text-xs uppercase tracking-[0.3em] shadow-2xl active:scale-95 transition-transform flex items-center justify-center gap-3 disabled:opacity-70 disabled:cursor-not-allowed"
+                >
+                  {isDeploying ? 'Initializing...' : `Initialize ${formData.symbol || 'Contract'}`}
+                  <CheckCircle2 size={20} className={isDeploying ? 'animate-spin' : ''} />
                 </button>
               </div>
             </div>
@@ -184,7 +207,16 @@ const Launch = () => {
                   <div key={idx} className="p-6 bg-white/5 rounded-3xl border border-white/5 group hover:bg-white/10 transition-all card-hover">
                     <div className="flex items-center gap-4 mb-4">
                       <div className="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center overflow-hidden border border-white/5">
-                        {ad.icon ? <img src={ad.icon} alt="" className="w-full h-full object-cover"/> : <Zap className="text-cyan-500 w-5 h-5"/>}
+                        {ad.icon ? (
+                          <img 
+                            src={ad.icon} 
+                            alt="" 
+                            className="w-full h-full object-cover"
+                            onError={(e) => { e.target.onerror = null; e.target.src = `https://ui-avatars.com/api/?name=${ad.tokenAddress}&background=0f172a&color=2dd4bf`; }}
+                          />
+                        ) : (
+                          <Zap className="text-cyan-500 w-5 h-5"/>
+                        )}
                       </div>
                       <div className="overflow-hidden">
                         <p className="text-[10px] font-black text-cyan-500 uppercase tracking-widest">Active Velocity</p>
